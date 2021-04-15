@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1; // If this is incremented onUpgrade() will be executed
-    private static final String DATABASE_NAME = "Fishing.db"; // The file name of our database
+    private static final String DATABASE_NAME = "Fishes.db"; // The file name of our database
 
     DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

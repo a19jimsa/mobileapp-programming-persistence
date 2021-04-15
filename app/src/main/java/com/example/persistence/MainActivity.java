@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -23,7 +24,9 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
     private List<Fish> fishList;
     private String fishString;
-    private EditText editText;
+    private EditText editText1;
+    private EditText editText2;
+    private EditText editText3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
         database = databaseHelper.getWritableDatabase();
         fishList = new ArrayList<>();
-        editText = findViewById(R.id.editText);
+        editText1 = findViewById(R.id.editText1);
+        editText2 = findViewById(R.id.editText2);
+        editText3 = findViewById(R.id.editText3);
 
         Button writeButton = findViewById(R.id.writeButton);
         writeButton.setOnClickListener(new View.OnClickListener() {
@@ -53,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void readFromDatabase() {
+        Log.d("a19jimsa", "Hejsan");
         fishString = "";
         fishList = getFish();
         for(int i = 0; i < fishList.size(); i++){
@@ -63,7 +69,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void writeToDatabase(){
+        if(editText1.getText().length() != 0 || editText2.getText().length() != 0 || editText3.getText().length() != 0){
+            addFish(editText1.getText().toString(), Integer.parseInt(editText2.getText().toString()), editText3.getText().toString());
+            clearEdit();
+        }else {
+            Toast.makeText(this, "Inget av fälten får vara tomma!", Toast.LENGTH_SHORT).show();
+        }
+    }
 
+    private void clearEdit(){
+        editText1.getText().clear();
+        editText2.getText().clear();
+        editText3.getText().clear();
     }
 
     private int deleteMountain(long id) {
