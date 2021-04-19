@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         editText3.getText().clear();
     }
 
-    private int deleteMountain(long id) {
+    private int deleteFish(long id) {
         String selection = DatabaseTables.Fish.COLUMN_NAME_ID + " = ?";
         String[] selectionArgs = { String.valueOf(id) };
         return database.delete(DatabaseTables.Fish.TABLE_NAME, selection, selectionArgs);
