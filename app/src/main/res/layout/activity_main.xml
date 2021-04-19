@@ -38,11 +38,11 @@
 
     <TextView
         android:id="@+id/textView"
+        android:padding="20dp"
         android:layout_marginTop="20dp"
-        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:text="TextView"
+        android:text="Tryck på read för att få ut alla fiskar i databasen."
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
