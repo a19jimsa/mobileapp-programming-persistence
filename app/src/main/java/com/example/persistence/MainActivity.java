@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Create
+        // Initialize instance members.
         databaseHelper = new DatabaseHelper(this);
         database = databaseHelper.getWritableDatabase();
         fishList = new ArrayList<>();
