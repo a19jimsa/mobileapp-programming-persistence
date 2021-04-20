@@ -138,3 +138,7 @@ För att läsa ut värden från databasen så anropas funktionen som tidigare n�
 Strängen som är privat töms vid varje anrop så den är tom. Sedan läggs varje fisk till. Och sedan sätts till textView.
 
 <img src="app1.png" width="300"/>
+<img src="app2.png" width="300"/>
+<img src="app3.png" width="300"/>
+
+Så här ser det ut när man lägger till och läser ut fiskar ur databasen.
