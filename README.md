@@ -15,7 +15,7 @@ Här finns statiska konstanter för att lägga till och anropa korrekt data och 
 
 ```Java
     static class Fish {
-
+        //VConstants that is same as fish-properties.
         static final String TABLE_NAME = "fish";
         static final String COLUMN_NAME_ID = "id";
         static final String COLUMN_NAME_NAME = "name";
@@ -55,45 +55,86 @@ Här är en tabell för fiskar i klassen DatabasHelper. Fish är en statisk inne
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         sqLiteDatabase.execSQL(DatabaseTables.SQL_DELETE_TABLE_FISH);
-        onCreate(sqLi
+        onCreate(sqLiteDatabase);
+    }
 ```
 
 Funktionerna är självbeskrivande. Enda ändringen är att det skapas en databas som heter Fishes istället för Mountain.
 
-I klassen Fish så läggs relevant data till för fiskar som användaren får fylla i och som kommer lagras i databasen och matchas med tabellen i databasen så samma data lagras i både ett fisk objekt och en tabell. Så när man hämtar data från filen
+I klassen Fish så läggs relevant data till för fiskar som användaren får fylla i och som kommer lagras i databasen och matchas med tabellen i databasen så samma data lagras i både ett fisk objekt och en tabell. Så när man hämtar data från filen sätts det till nya fiskobjekt med korrekt värden.
 
-## Följande grundsyn gäller dugga-svar:
-
-- Ett kortfattat svar är att föredra. Svar som är längre än en sida text (skärmdumpar och programkod exkluderat) är onödigt långt.
-- Svaret skall ha minst en snutt programkod.
-- Svaret skall inkludera en kort övergripande förklarande text som redogör för vad respektive snutt programkod gör eller som svarar på annan teorifråga.
-- Svaret skall ha minst en skärmdump. Skärmdumpar skall illustrera exekvering av relevant programkod. Eventuell text i skärmdumpar måste vara läsbar.
-- I de fall detta efterfrågas, dela upp delar av ditt svar i för- och nackdelar. Dina för- respektive nackdelar skall vara i form av punktlistor med kortare stycken (3-4 meningar).
-
-Programkod ska se ut som exemplet nedan. Koden måste vara korrekt indenterad då den blir lättare att läsa vilket gör det lättare att hitta syntaktiska fel.
-
-```
-function errorCallback(error) {
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            // Geolocation API stöds inte, gör något
-            break;
-        case error.POSITION_UNAVAILABLE:
-            // Misslyckat positionsanrop, gör något
-            break;
-        case error.UNKNOWN_ERROR:
-            // Okänt fel, gör något
-            break;
+```Java
+    private List<Fish> getFish() {
+        Cursor cursor = database.query(DatabaseTables.Fish.TABLE_NAME, null, null, null, null, null, null);
+        List<Fish> fishList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Fish fish = new Fish(
+                    cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseTables.Fish.COLUMN_NAME_ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DatabaseTables.Fish.COLUMN_NAME_NAME)),
+                    cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseTables.Fish.COLUMN_NAME_WIDTH)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DatabaseTables.Fish.COLUMN_NAME_LOCATION))
+            );
+            fishList.add(fish);
+        }
+        cursor.close();
+        return fishList;
     }
-}
 ```
+Här sätts alla fiskar i databasen till en arraylist. Hela databas-filen loopas igenom och för varje rad i tabellen skapas en ny fisk. Och varje värde i kolumnen sätts till ett attribut hos fisken.
 
-Bilder läggs i samma mapp som markdown-filen.
+Sedan anropar man funktionen och får en arrayList returnerad med alla fisk-objekt.
 
-![](android.png)
+För att lägga till nya fiskar till tabellen anropas funktionen addFish.
 
-Läs gärna:
+```Java
+    private long addFish(String name, int width, String location) {
+        ContentValues values = new ContentValues();
+        values.put(DatabaseTables.Fish.COLUMN_NAME_NAME, name);
+        values.put(DatabaseTables.Fish.COLUMN_NAME_WIDTH, width);
+        values.put(DatabaseTables.Fish.COLUMN_NAME_LOCATION, location);
+        return database.insert(DatabaseTables.Fish.TABLE_NAME, null, values);
+    }
+```
+Funktionen lägger till data i en database med insert. Alla värden som skickas in som argument läggs till för varje kolumn och läggs till som en ny rad i tabellen.
 
-- Boulos, M.N.K., Warren, J., Gong, J. & Yue, P. (2010) Web GIS in practice VIII: HTML5 and the canvas element for interactive online mapping. International journal of health geographics 9, 14. Shin, Y. &
-- Wunsche, B.C. (2013) A smartphone-based golf simulation exercise game for supporting arthritis patients. 2013 28th International Conference of Image and Vision Computing New Zealand (IVCNZ), IEEE, pp. 459–464.
-- Wohlin, C., Runeson, P., Höst, M., Ohlsson, M.C., Regnell, B., Wesslén, A. (2012) Experimentation in Software Engineering, Berlin, Heidelberg: Springer Berlin Heidelberg.
+För att skriva till databasen skapades en funktion.
+
+```Java
+    private void writeToDatabase(){
+        if(editText1.getText().length() != 0 || editText2.getText().length() != 0 || editText3.getText().length() != 0){
+            addFish(editText1.getText().toString(), Integer.parseInt(editText2.getText().toString()), editText3.getText().toString());
+            clearEdit();
+        }else {
+            Toast.makeText(this, "Inget av fälten får vara tomma!", Toast.LENGTH_SHORT).show();
+        }
+    }
+```
+Det denna gör är att kolla så inte det användaren skrivit in är tomma fält. Om det är korrekt så anropas funktionen som lägger till en ny fisk. Om inte det är korrekt så skrivs en toast ut som förklarar problemet med tomma EditText fält.
+
+När en fisk är tillagd tas så töms EditText för att inte man ska lägga in samma fisk flera gånger.
+
+```Java
+  private void clearEdit(){
+        editText1.getText().clear();
+        editText2.getText().clear();
+        editText3.getText().clear();
+    }
+```
+Funktion för att tömma fälten.
+
+För att läsa ut värden från databasen så anropas funktionen som tidigare nämnt getFish() som returnerar en arrayList. Denna loopas sedan igenom och sätter alla fiskar till en sträng med radbrytning. För att sedan sättas till en TextView som skriver ut alla fiskar. Genom att använda toString av varje fisk-objekt som skriver ut datan ett fiskobjekt har.
+
+```Java
+    private void readFromDatabase() {
+        fishString = "";
+        fishList = getFish();
+        for(int i = 0; i < fishList.size(); i++){
+            fishString += fishList.get(i).toString() +"\n";
+        }
+        TextView textView = findViewById(R.id.textView);
+        textView.setText(fishString);
+    }
+```
+Strängen som är privat töms vid varje anrop så den är tom. Sedan läggs varje fisk till. Och sedan sätts till textView.
+
+
